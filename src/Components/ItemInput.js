@@ -10,7 +10,26 @@ export default class ItemInput extends React.Component {
         this.state = {
             item: ''
         }
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
+
+    componentDidMount() {
+        window.addEventListener('beforeunload', this.onUnload)
+    }
+
+    componentWillUnmount() {
+        const { item } = this.state;
+
+        if (!item) {
+            window.removeEventListener('beforeUnload', this.onUnload)
+        }
+    }
+
+    onUnload(e) {
+        e.preventDefault();
+        e.returnValue = '';
+     }
 
     handleChange(e) {
         this.setState({ item: e.target.value })
@@ -22,6 +41,16 @@ export default class ItemInput extends React.Component {
             -We'll prevent users from submitting empty strings or only spaces.
             -We'll add the item to our previous items list and reset this.state.item to its initial value.
         */
+
+        e.preventDefault();
+
+        const { addItem } = this.props;
+        const { item } = this.state;
+
+        if (!item.trim()) return;
+
+        addItem(item);
+        this.setState({ item: '' })
     }
     
     render() {
